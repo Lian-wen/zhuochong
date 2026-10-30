@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>桌宠</title>
+<link rel="stylesheet" href="stage.css">
+</head>
+<body>
+<div id="scene">
+
+  <div id="bubble" class="bubble">
+    <div class="tag"><i></i><span id="bTag">桌宠</span></div>
+    <div class="msg" id="bMsg"></div>
+  </div>
+
+  <div id="pet" class="pet hit" data-state="idle">
+    <svg id="catSvg" viewBox="0 0 160 170" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="furG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c3bdb3"/>
+          <stop offset="100%" stop-color="#aca69c"/>
+        </linearGradient>
+        <linearGradient id="bellyG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f6f2ea"/>
+          <stop offset="100%" stop-color="#e8e2d6"/>
+        </linearGradient>
+      </defs>
+
+      <!-- 尾巴 -->
+      <g class="tail">
+        <path d="M96 158 C132 162 152 140 144 118"
+              fill="none" stroke="#ada79d" stroke-width="14" stroke-linecap="round"/>
+      </g>
+
+      <!-- 身体 -->
+      <g class="body">
+        <path d="M50 168 C42 142 48 104 80 104 C112 104 118 142 110 168 Z" fill="url(#furG)" stroke="#9a948a" stroke-width="2"/>
+        <path d="M66 168 C59 146 63 124 80 124 C97 124 101 146 94 168 Z" fill="url(#bellyG)"/>
+        <!-- 前爪 -->
+        <ellipse cx="65" cy="164" rx="13" ry="7.5" fill="#f2ede4" stroke="#9a948a" stroke-width="1.6"/>
+        <ellipse cx="95" cy="164" rx="13" ry="7.5" fill="#f2ede4" stroke="#9a948a" stroke-width="1.6"/>
+      </g>
+
+      <!-- 耳朵 -->
+      <path d="M52 62 L58 26 L88 48 Z" fill="#b6b0a6" stroke="#9a948a" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M108 62 L102 26 L72 48 Z" fill="#b6b0a6" stroke="#9a948a" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M60 56 L63 36 L78 49 Z" fill="#f0b8c2"/>
+      <path d="M100 56 L97 36 L82 49 Z" fill="#f0b8c2"/>
+
+      <!-- 头 -->
+      <g class="head">
+        <circle cx="80" cy="78" r="38" fill="url(#furG)" stroke="#9a948a" stroke-width="2"/>
+        <!-- 额头花纹 -->
+        <path d="M74 48 L74 58" stroke="#9a948a" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+        <path d="M80 45 L80 56" stroke="#9a948a" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+        <path d="M86 48 L86 58" stroke="#9a948a" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+
+        <!-- 眼睛 -->
+        <g class="blink">
+          <ellipse cx="66" cy="77" rx="6.4" ry="7.2" fill="#2b2a28"/>
+          <circle cx="68" cy="74" r="2.1" fill="#fff"/>
+          <ellipse cx="94" cy="77" rx="6.4" ry="7.2" fill="#2b2a28"/>
+          <circle cx="96" cy="74" r="2.1" fill="#fff"/>
+        </g>
+
+        <!-- 腮红 -->
+        <ellipse cx="56" cy="90" rx="8" ry="4.6" fill="#f3b3bf" opacity=".7"/>
+        <ellipse cx="104" cy="90" rx="8" ry="4.6" fill="#f3b3bf" opacity=".7"/>
+
+        <!-- 鼻子与嘴 -->
+        <path d="M76 88 L84 88 L80 93 Z" fill="#e0899a"/>
+        <path d="M80 93 C80 98 74 99 71 95" fill="none" stroke="#7d766c" stroke-width="2" stroke-linecap="round"/>
+        <path d="M80 93 C80 98 86 99 89 95" fill="none" stroke="#7d766c" stroke-width="2" stroke-linecap="round"/>
+
+        <!-- 胡须 -->
+        <g stroke="#a9a299" stroke-width="1.6" stroke-linecap="round" opacity=".85">
+          <path d="M46 84 L28 81"/><path d="M46 89 L29 90"/>
+          <path d="M114 84 L132 81"/><path d="M114 89 L131 90"/>
+        </g>
+      </g>
+    </svg>
+
+    <img id="petImg" alt="">
+    <div class="zzz"><span>z</span><span>z</span><span>Z</span></div>
+    <div class="sweat">💧</div>
+  </div>
+
+</div>
+<script src="stage.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>桌宠 · 卡片坞</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="panel">
+
+  <header class="hd">
+    <div class="hd-l">
+      <span class="pulse"></span>
+      <b id="petName">桌宠</b>
+      <span class="clock" id="clock">--:--</span>
+    </div>
+    <div class="hd-r">
+      <button class="ic" id="btnRefresh" title="刷新全部">↻</button>
+      <button class="ic" id="btnClose" title="收起">✕</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tb on" data-tab="home">概览</button>
+    <button class="tb" data-tab="paper">论文</button>
+    <button class="tb" data-tab="news">资讯</button>
+    <button class="tb" data-tab="set">设置</button>
+  </nav>
+
+  <div class="body" id="body">
+
+    <!-- ========== 概览 ========== -->
+    <section class="tab on" id="tab-home">
+
+      <div class="card">
+        <div class="c-head"><span>天气</span><span class="stamp" id="wStamp"></span></div>
+        <div class="w-main">
+          <div class="w-temp"><b id="wTemp">--</b><i>°C</i></div>
+          <div class="w-side">
+            <div class="w-icon" id="wIcon">🌡️</div>
+            <div>
+              <div class="w-city" id="wCity">正在取数据…</div>
+              <div class="w-text" id="wText">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="w-strip">
+          <span id="wRange">—</span>
+          <span class="dotsep">·</span>
+          <span id="wFeels">—</span>
+          <span class="dotsep">·</span>
+          <span id="wWind">—</span>
+          <span class="dotsep">·</span>
+          <span id="wHum">—</span>
+        </div>
+        <div class="alert" id="wRain" hidden></div>
+        <div class="hours" id="wHours"></div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>API 余额</span><span class="stamp" id="bStamp"></span></div>
+        <div class="b-main">
+          <b id="bTotal">--</b>
+          <span class="tag2" id="bPeak">—</span>
+        </div>
+        <div class="b-sub" id="bSpend">今天还没开始算</div>
+        <div class="spark" id="bSpark"></div>
+        <div class="b-list" id="bList"></div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>这台机器</span><span class="stamp" id="sStamp"></span></div>
+        <div class="bar"><label>CPU</label><div class="track"><i id="barCpu"></i></div><span id="cpuTxt">0%</span></div>
+        <div class="bar"><label>内存</label><div class="track"><i id="barMem"></i></div><span id="memTxt">0%</span></div>
+        <div class="bar"><label>磁盘</label><div class="track"><i id="barDisk"></i></div><span id="diskTxt">—</span></div>
+        <div class="bar"><label>GPU</label><div class="track"><i id="barGpu"></i></div><span id="gpuTxt">—</span></div>
+        <div class="net">
+          <span>↓ <b id="netDown">0</b></span>
+          <span>↑ <b id="netUp">0</b></span>
+          <span class="grow"></span>
+          <span id="memGB">—</span>
+        </div>
+        <div class="net" id="gpuRow" style="border-top:0;padding-top:2px">
+          <span id="gpuVendor">—</span>
+          <span class="grow"></span>
+          <span id="gpuExtra"></span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========== 论文 ========== -->
+    <section class="tab" id="tab-paper">
+      <div class="card">
+        <div class="c-head"><span>今日论文</span><span class="stamp" id="pStamp"></span></div>
+        <div class="hint" id="pMeta" style="margin:0 0 8px"></div>
+        <ul class="paperlist" id="pList"></ul>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>订阅话题</span><span class="stamp">改完自动保存</span></div>
+        <div id="topicBox"></div>
+        <div class="hint">arXiv 只认英文。关键词用逗号分隔；前缀 <code>-</code> 表示排除（如 -review）；短语直接写英文，会自动加引号。</div>
+        <div class="row" style="margin-top:9px">
+          <button class="btn sm" id="btnPaperNow">立刻抓一次</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>待引文献 · <b id="libCount">0</b> 篇</span><span class="stamp"></span></div>
+        <div class="row" style="margin-bottom:8px">
+          <button class="btn sm" id="btnBibAll">复制全部 BibTeX</button>
+          <button class="btn sm ghost" id="btnBibFile">导出 .bib</button>
+        </div>
+        <ul class="newslist" id="libList"></ul>
+      </div>
+    </section>
+
+    <!-- ========== 资讯 ========== -->
+    <section class="tab" id="tab-news">
+      <div class="card">
+        <div class="c-head"><span>今日早报</span><span class="stamp" id="nStamp"></span></div>
+        <div class="summary" id="nSummary"></div>
+        <ul class="newslist" id="nList"></ul>
+      </div>
+
+      <div class="card" id="cardGh">
+        <div class="c-head"><span>GitHub</span><span class="stamp" id="gStamp"></span></div>
+        <ul class="newslist" id="gList"></ul>
+      </div>
+    </section>
+
+    <!-- ========== 设置 ========== -->
+    <section class="tab" id="tab-set">
+
+      <div class="card">
+        <div class="c-head"><span>位置</span></div>
+        <div class="row">
+          <input class="inp" id="cityInput" placeholder="输入城市名，回车搜索">
+          <button class="btn sm" id="btnCity">搜索</button>
+        </div>
+        <div class="hint" id="cityHint">当前：北京</div>
+        <div class="alist" id="cityList"></div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>API Key</span></div>
+        <div class="field">
+          <label>DeepSeek</label>
+          <div class="row">
+            <input class="inp" id="keyDeepseek" type="password" placeholder="sk-... 只存本机，DPAPI 加密">
+            <button class="btn sm" id="btnKey">保存</button>
+          </div>
+          <div class="hint" id="keyHint"></div>
+        </div>
+        <details class="more">
+          <summary>其他平台（可选）</summary>
+          <div class="field"><label>Moonshot</label><input class="inp" id="keyMoonshot" type="password" placeholder="sk-..."></div>
+          <div class="field"><label>硅基流动</label><input class="inp" id="keySiliconflow" type="password" placeholder="sk-..."></div>
+          <div class="field"><label>OpenRouter</label><input class="inp" id="keyOpenrouter" type="password" placeholder="sk-or-..."></div>
+          <button class="btn sm" id="btnKeyMore">保存其他平台</button>
+        </details>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>提醒阈值</span></div>
+        <div class="field">
+          <label>余额低于 <b id="lblBal">¥20</b> 时提醒</label>
+          <input type="range" id="rngBal" min="1" max="200" step="1" value="20">
+        </div>
+        <div class="field">
+          <label>连续坐 <b id="lblSit">45</b> 分钟提醒起身</label>
+          <input type="range" id="rngSit" min="15" max="120" step="5" value="45">
+        </div>
+        <div class="field">
+          <label>熬夜劝退时间 <b id="lblNight">23:30</b></label>
+          <input type="range" id="rngNight" min="21" max="26" step="0.5" value="23.5">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>我的桌宠</span><span class="stamp" id="petName">桌宠</span></div>
+        <div class="field"><label>名字</label><input class="inp" id="petNameInp" maxlength="12" placeholder="给它起个名字"></div>
+        <div class="petgrid" id="petGrid"></div>
+        <div class="row" style="margin-top:9px">
+          <button class="btn sm" id="btnPickImg">换成我的桌宠</button>
+          <button class="btn sm ghost" id="btnOpenPetDir">素材文件夹</button>
+        </div>
+        <div class="hint">点上面的图直接换。图片丢进 <code>%APPDATA%\zhuochong\pet\</code> 就会出现在这里；PNG 透明底最合适，JPG 也行。</div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>它自己</span></div>
+        <div class="field">
+          <label>大小 <b id="lblScale">1.0×</b></label>
+          <input type="range" id="rngScale" min="0.6" max="1.8" step="0.1" value="1">
+        </div>
+        <div class="switch"><span>安静模式（不主动说话）</span><input type="checkbox" id="swQuiet"></div>
+        <div class="switch"><span>自己播报（不用点它）</span><input type="checkbox" id="swReport"></div>
+        <div class="field" style="margin-top:10px">
+          <label>播报间隔 <b id="lblReport">5</b> 分钟</label>
+          <input type="range" id="rngReport" min="1" max="15" step="1" value="5">
+        </div>
+        <div class="switch"><span>减少动态</span><input type="checkbox" id="swReduce"></div>
+        <div class="switch"><span>自己溜达</span><input type="checkbox" id="swWalk" checked></div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>卡片开关</span></div>
+        <div class="switch"><span>系统监控</span><input type="checkbox" id="swSys" checked></div>
+        <div class="switch"><span>GitHub 动态</span><input type="checkbox" id="swGh"></div>
+        <div class="field" style="margin-top:10px">
+          <label>GitHub 用户名</label>
+          <input class="inp" id="ghUser" placeholder="例如 torvalds">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="c-head"><span>关于</span></div>
+        <div class="hint">桌宠 0.2 · 方案 B<br>左键点它换一条播报 · 右键点它开这个面板 · Ctrl+Shift+A 框选识别 · Ctrl+Shift+H 老板键</div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sm ghost" id="btnConfDir">配置文件夹</button>
+          <button class="btn sm ghost" id="btnPetDir">宠物素材</button>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+<script src="panel.js"></script>
+</body>
+</html>

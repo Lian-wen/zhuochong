@@ -1,0 +1,89 @@
+*{box-sizing:border-box;user-select:none;-webkit-user-drag:none;}
+html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;overflow:hidden;
+  font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+#scene{position:fixed;inset:0;pointer-events:none;}
+
+.pet{position:absolute;left:0;bottom:0;width:150px;height:160px;
+  pointer-events:auto;cursor:grab;will-change:left,bottom,transform;z-index:5;
+  transform-origin:50% 100%;transition:transform .12s ease-out;}
+.pet:active{cursor:grabbing;}
+.pet svg,.pet img{display:block;width:100%;height:100%;
+  transform-origin:50% 100%;filter:drop-shadow(0 6px 8px rgba(40,35,28,.16));}
+.pet img{display:none;object-fit:contain;}
+
+/* 呼吸 */
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,.99)}}
+.pet[data-state="idle"] svg,.pet[data-state="idle"] img{animation:breathe 3.4s ease-in-out infinite;}
+
+/* 走路 */
+@keyframes walkbob{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-5px) rotate(1.2deg)}}
+.pet[data-state="walk"] svg,.pet[data-state="walk"] img{animation:walkbob .42s ease-in-out infinite;}
+
+/* 睡觉 */
+@keyframes sleepbreathe{0%,100%{transform:scale(1,.97)}50%{transform:scale(1.01,.985)}}
+.pet[data-state="sleep"] svg,.pet[data-state="sleep"] img{animation:sleepbreathe 5.2s ease-in-out infinite;}
+.pet[data-state="sleep"] .blink{transform:scaleY(.08);}
+
+/* 喘气 */
+@keyframes pant{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.975)}}
+.pet[data-state="busy"] svg{animation:pant .9s ease-in-out infinite;}
+
+/* 被拎起来 */
+.pet[data-state="drag"] svg,.pet[data-state="drag"] img{animation:none;transform:scale(.98,1.02) rotate(0deg);}
+
+/* 图片形态：呼吸走纵向，走路带侧倾 */
+@keyframes imgBreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.992,1.016)}}
+@keyframes imgWalk{0%,100%{transform:translateY(0) rotate(-1.6deg)}50%{transform:translateY(-5px) rotate(1.6deg)}}
+@keyframes imgSleep{0%,100%{transform:scale(1,.994)}50%{transform:scale(1.004,1.013)}}
+@keyframes land{0%{transform:scale(1.09,.87)}55%{transform:scale(.965,1.045)}100%{transform:scale(1,1)}}
+
+.pet[data-state="idle"] img{animation:imgBreathe 3.6s ease-in-out infinite;}
+.pet[data-state="walk"] img{animation:imgWalk .5s ease-in-out infinite;}
+.pet[data-state="sleep"] img{animation:imgSleep 5.6s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(40,35,28,.12)) brightness(.97);}
+.pet[data-state="busy"] img{animation:imgBreathe 1.5s ease-in-out infinite;}
+.pet.landing svg,.pet.landing img{animation:land .28s cubic-bezier(.2,.9,.3,1);}
+
+/* 眨眼 / 尾巴 */
+.blink{transform-box:view-box;transform-origin:80px 77px;animation:blink 4.8s infinite;}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.06)}}
+.tail{transform-box:view-box;transform-origin:108px 158px;animation:wag 2.6s ease-in-out infinite;}
+@keyframes wag{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg)}}
+.pet[data-state="walk"] .tail{animation-duration:1.1s;}
+
+/* zzz */
+.zzz{position:absolute;right:-6px;top:-4px;opacity:0;transition:opacity .4s;font-weight:600;
+  color:#8b93a0;font-family:Georgia,serif;}
+.zzz span{display:inline-block;font-size:11px;animation:zzzup 2.4s ease-in-out infinite;}
+.zzz span:nth-child(2){font-size:14px;animation-delay:.5s}
+.zzz span:nth-child(3){font-size:17px;animation-delay:1s}
+@keyframes zzzup{0%{opacity:0;transform:translate(0,0)}30%{opacity:.9}100%{opacity:0;transform:translate(6px,-16px)}}
+.pet[data-state="sleep"] .zzz{opacity:1}
+
+/* 汗 */
+.sweat{position:absolute;left:6px;top:34px;font-size:14px;opacity:0;transition:opacity .3s;}
+.pet[data-state="busy"] .sweat{opacity:1;animation:sweatdrop 1.6s infinite}
+@keyframes sweatdrop{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+/* 影子 */
+#shadow{position:absolute;bottom:2px;height:12px;width:96px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(60,50,40,.24),rgba(60,50,40,0) 70%);
+  transform:translateX(-50%);pointer-events:none;z-index:4;}
+
+/* 气泡 */
+.bubble{position:absolute;min-width:110px;max-width:330px;background:#fffdf9;
+  border:1px solid #e7e0d4;border-radius:14px;padding:9px 13px 10px;
+  box-shadow:0 14px 34px -14px rgba(40,32,24,.4),0 2px 6px rgba(40,32,24,.06);
+  opacity:0;transform:translate(-50%,6px);transition:opacity .22s ease,transform .22s ease;
+  pointer-events:none;z-index:9;}
+.bubble.show{opacity:1;transform:translate(-50%,0);}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;width:11px;height:11px;
+  background:#fffdf9;border-right:1px solid #e7e0d4;border-bottom:1px solid #e7e0d4;transform:rotate(45deg);}
+.bubble .tag{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#948a7e;letter-spacing:.04em;}
+.bubble .tag i{width:6px;height:6px;border-radius:50%;background:#7ba05b;flex:none;}
+.bubble .msg{font-size:13.5px;line-height:1.55;color:#241f1a;margin-top:3px;word-break:break-word;}
+.bubble.warn{border-color:#eed3c9;background:#fff9f6;}
+.bubble.warn::after{background:#fff9f6;border-color:#eed3c9;}
+.bubble.warn .tag i{background:#c4553b;}
+.bubble.info .tag i{background:#5b87a8;}
+
+body.reduce .pet svg,body.reduce .pet img,body.reduce .zzz span{animation:none !important;}

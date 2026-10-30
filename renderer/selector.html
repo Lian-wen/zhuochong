@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>框选</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:100%;height:100%;overflow:hidden;background:transparent;cursor:crosshair;
+    font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-user-select:none;}
+  #shot{position:fixed;inset:0;width:100vw;height:100vh;object-fit:fill;display:block;}
+  #mask{position:fixed;inset:0;background:rgba(20,16,12,.45);}
+  #sel{position:fixed;display:none;border:1px solid #fff;
+    box-shadow:0 0 0 9999px rgba(20,16,12,.45), inset 0 0 0 1px rgba(0,0,0,.25);}
+  #size{position:absolute;top:-24px;left:0;background:#1c1f23;color:#fff;font-size:11px;
+    padding:2px 7px;border-radius:4px;white-space:nowrap;}
+  #hint{position:fixed;left:50%;top:36px;transform:translateX(-50%);
+    background:rgba(28,31,35,.9);color:#fff;font-size:12.5px;padding:7px 16px;border-radius:999px;
+    letter-spacing:.02em;}
+</style>
+</head>
+<body>
+<img id="shot" alt="">
+<div id="mask"></div>
+<div id="sel"><div id="size"></div></div>
+<div id="hint">拖动框选 · 右键或 Esc 取消</div>
+<script>
+(function () {
+  const shot = document.getElementById('shot');
+  const mask = document.getElementById('mask');
+  const sel = document.getElementById('sel');
+  const size = document.getElementById('size');
+  const hint = document.getElementById('hint');
+  let dragging = false, sx = 0, sy = 0;
+
+  window.api.on('shot:image', (src) => {
+    shot.onload = () => window.api.shotReady();
+    shot.src = src;
+    document.body.style.cursor = 'crosshair';
+  });
+
+  function rect(e) {
+    const x = Math.min(sx, e.clientX), y = Math.min(sy, e.clientY);
+    return { x, y, width: Math.abs(e.clientX - sx), height: Math.abs(e.clientY - sy) };
+  }
+
+  document.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    dragging = true;
+    sx = e.clientX; sy = e.clientY;
+    mask.style.display = 'none';
+    hint.style.display = 'none';
+    sel.style.display = 'block';
+    sel.style.left = sx + 'px'; sel.style.top = sy + 'px';
+    sel.style.width = '0px'; sel.style.height = '0px';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const r = rect(e);
+    sel.style.left = r.x + 'px';
+    sel.style.top = r.y + 'px';
+    sel.style.width = r.width + 'px';
+    sel.style.height = r.height + 'px';
+    size.textContent = Math.round(r.width) + ' × ' + Math.round(r.height);
+    size.style.left = '0px';
+    size.style.top = r.y > 30 ? '-24px' : (r.height + 6) + 'px';
+  });
+
+  document.addEventListener('mouseup', (e) => {
+    if (!dragging) return;
+    dragging = false;
+    const r = rect(e);
+    window.__lastRect = r;
+    if (r.width < 8 || r.height < 8) { window.api.shotCancel(); return; }
+    window.api.shotConfirm(r);
+  });
+
+  document.addEventListener('contextmenu', (e) => { e.preventDefault(); window.api.shotCancel(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.api.shotCancel(); });
+})();
+</script>
+</body>
+</html>
