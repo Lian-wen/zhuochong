@@ -104,6 +104,26 @@ tools/               图标生成、OCR 脚本、CDP 自检脚本
 
 `tools/probe.js` 是个小工具：`electron . --probe --remote-debugging-port=9222` 后用 CDP 查 DOM、抓截图，在没有可视桌面的环境里也能验证界面。
 
+## 打包成 exe
+
+```bash
+npm run dist
+```
+
+产物在 `release/`：
+
+- `Zhuochong-Setup-0.2.0.exe` —— 安装版，可选安装目录、自动建桌面快捷方式
+- `Zhuochong-0.2.0-portable.exe` —— 免安装绿色版，双击即用，拷到 U 盘也能跑
+
+国内网络如果卡在下载打包工具（winCodeSign / nsis），改用镜像：
+
+```bash
+set ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
+npm run dist
+```
+
+打包时 `assets/pet/` 里除 `cat.png` 外的图会被排除（`build.files` 里写了 `!assets/pet/!(cat.png)`），因为那些是个人素材，不该进安装包。
+
 ## 设计取舍
 
 用 Electron 是因为它能在 Windows 上稳定做「透明 + 置顶 + 点击穿透」的窗口，代价是安装包大、常驻内存约 120MB。如果哪天要瘦身，`renderer/` 那三份文件可以一行不改地搬去 Tauri，只有 `main.js` 要重写成 Rust。

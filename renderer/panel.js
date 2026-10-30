@@ -216,6 +216,18 @@ function renderPapers() {
   }
   if (p === lastPapers) return;
   lastPapers = p;
+
+  if (p.empty) {
+    $('pMeta').textContent = '还没设置话题';
+    $('pList').innerHTML = `<li class="paper"><p class="p-tldr">先在下面「订阅话题」里点一个模板，或者自己填关键词 —— 填完这里就有论文了。</p></li>`;
+    return;
+  }
+  if (!p.items.length) {
+    $('pMeta').textContent = `扫了 ${p.poolSize} 篇，没有命中`;
+    $('pList').innerHTML = `<li class="paper"><p class="p-tldr">话题太窄了。把关键词放宽一点，或者加一个同义词试试。</p></li>`;
+    return;
+  }
+
   const tldrOn = !!(cfg && cfg.papers && cfg.papers.tldr);
   const hasTldr = p.items.some((x) => x.tldr);
   $('pMeta').textContent = `扫了 ${p.poolSize} 篇，留下 ${p.items.length} 篇`
@@ -262,14 +274,66 @@ function renderTopics() {
   const sig = JSON.stringify(topics);
   if (sig === topicSig) return;
   topicSig = sig;
+
+  if (!topics.length) {
+    $('topicBox').innerHTML = '<div class="hint" style="margin:0 0 6px">还没有话题。点上面的模板一键加，或者「自己填」。</div>';
+    return;
+  }
+
   $('topicBox').innerHTML = topics.map((t) => `
     <div class="topic" data-id="${esc(t.id)}">
-      <div class="topic-h"><b>${esc(t.name)}</b><input type="checkbox" data-on ${t.on !== false ? 'checked' : ''}></div>
+      <div class="topic-h">
+        <b>${esc(t.name)}</b>
+        <input type="checkbox" data-on ${t.on !== false ? 'checked' : ''}>
+        <button class="tdel" data-del title="删掉这个话题">×</button>
+      </div>
       <textarea class="inp ta" data-kw rows="3">${esc((t.keywords || []).join(', '))}</textarea>
       <div class="sub">排除：<input class="inp" data-ex value="${esc((t.exclude || []).join(', '))}" style="height:24px;margin-top:4px"></div>
     </div>`).join('');
   $('topicBox').querySelectorAll('textarea').forEach((ta) => { ta.scrollTop = 0; });
 }
+
+/* 话题模板：给新用户一个能立刻跑起来的起点 */
+const TEMPLATES = {
+  ai: {
+    name: 'AI / 大模型',
+    keywords: ['large language model', 'LLM', 'reasoning', 'agent', 'multimodal'],
+    exclude: ['survey'], cats: ['cs.CL', 'cs.AI']
+  },
+  materials: {
+    name: '材料 / 物理',
+    keywords: ['perovskite', 'thin film', 'dielectric', 'nanomaterial', 'crystal growth'],
+    exclude: ['survey'], cats: ['cond-mat.mtrl-sci', 'physics.app-ph']
+  },
+  bio: {
+    name: '生物 / 医学',
+    keywords: ['protein structure', 'single-cell', 'CRISPR', 'biomarker', 'drug delivery'],
+    exclude: ['survey'], cats: ['q-bio.BM', 'q-bio.QM']
+  },
+  econ: {
+    name: '经济 / 金融',
+    keywords: ['causal inference', 'panel data', 'asset pricing', 'market microstructure'],
+    exclude: ['survey'], cats: ['econ.EM', 'q-fin.TR']
+  },
+  blank: { name: '新话题', keywords: [], exclude: [], cats: [] }
+};
+
+$('topicTpl').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-tpl]');
+  if (!btn) return;
+  const tpl = TEMPLATES[btn.dataset.tpl];
+  if (!tpl) return;
+  const topics = (cfg.papers.topics || []).slice();
+  const id = 't' + Date.now().toString(36);
+  topics.push({ ...tpl, id, on: true, max: 60 });
+  cfg = await api.patchConfig({ papers: { topics } });
+  topicSig = '';
+  renderTopics();
+  lastPapers = null;
+  $('pMeta').textContent = '正在抓 arXiv…';
+  $('pList').innerHTML = '';
+  api.refresh('papers');
+});
 
 async function saveTopic(id, patch) {
   const topics = (cfg.papers.topics || []).map((t) => (t.id === id ? { ...t, ...patch } : t));
@@ -277,6 +341,19 @@ async function saveTopic(id, patch) {
   topicSig = '';
   renderTopics();
 }
+
+$('topicBox').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-del]');
+  if (!btn) return;
+  const row = btn.closest('.topic');
+  if (!row) return;
+  const id = row.dataset.id;
+  const topics = (cfg.papers.topics || []).filter((t) => t.id !== id);
+  cfg = await api.patchConfig({ papers: { topics } });
+  topicSig = '';
+  renderTopics();
+  lastPapers = null;
+});
 
 $('topicBox').addEventListener('change', (e) => {
   const row = e.target.closest('.topic');

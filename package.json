@@ -13,7 +13,8 @@
     "dist:dir": "electron-builder --win --dir"
   },
   "devDependencies": {
-    "electron": "^38.8.6"
+    "electron": "^38.8.6",
+    "electron-builder": "^26.18.0"
   },
   "keywords": [
     "desktop-pet",
@@ -38,8 +39,7 @@
     "productName": "桌宠",
     "copyright": "Copyright © 2026 Lian-wen",
     "directories": {
-      "output": "release",
-      "buildResources": "assets"
+      "output": "release"
     },
     "files": [
       "main.js",
