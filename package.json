@@ -3,12 +3,14 @@
   "version": "0.2.0",
   "description": "一只会主动播报天气、API 余额、GPU 状态和 arXiv 论文的 Windows 桌面宠物",
   "main": "main.js",
-  "author": "",
+  "author": "Lian-wen",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "icon": "node tools/make-icon.js"
+    "icon": "node tools/make-icon.js",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
   },
   "devDependencies": {
     "electron": "^38.8.6"
@@ -22,13 +24,60 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-name>/zhuochong.git"
+    "url": "https://github.com/Lian-wen/zhuochong.git"
   },
   "bugs": {
-    "url": "https://github.com/<your-name>/zhuochong/issues"
+    "url": "https://github.com/Lian-wen/zhuochong/issues"
   },
-  "homepage": "https://github.com/<your-name>/zhuochong#readme",
+  "homepage": "https://github.com/Lian-wen/zhuochong#readme",
   "engines": {
     "node": ">=18"
+  },
+  "build": {
+    "appId": "com.zhuochong.pet",
+    "productName": "桌宠",
+    "copyright": "Copyright © 2026 Lian-wen",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "!assets/pet/!(cat.png)",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "桌宠",
+      "artifactName": "Zhuochong-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "Zhuochong-${version}-portable.exe"
+    }
   }
 }

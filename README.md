@@ -36,7 +36,7 @@ Windows / Electron / 无后端 / 数据全在本机。
 需要 Node.js 18+。
 
 ```bash
-git clone https://github.com/<你的用户名>/zhuochong.git
+git clone https://github.com/Lian-wen/zhuochong.git
 cd zhuochong
 npm install
 npm start
