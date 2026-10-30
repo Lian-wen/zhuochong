@@ -24,3 +24,7 @@ desktop.ini
 # Python
 __pycache__/
 *.pyc
+
+# 本机辅助脚本（个人用，不进仓库）
+推送到GitHub.bat
+更新到GitHub.bat
