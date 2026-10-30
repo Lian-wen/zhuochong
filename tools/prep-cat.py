@@ -1,14 +1,24 @@
 """
-把 喵同学.png 的紫色噪声背景抠掉，裁边、缩放，输出透明 PNG。
-紫色在 HSV 里 H≈250-330，猫是橙/白/棕，色相完全不同，很好分。
+把一张纯色/近似纯色背景的宠物图抠成透明 PNG，裁边并按高度缩放。
+
+用法：
+    pip install pillow numpy
+    python tools/prep-cat.py 你的图.png [输出文件名]
+
+默认按"紫色噪声背景 + 橙白猫"调的色相区间（H≈172-245 / 0-255 刻度）。
+换别的背景色，改下面的 HUE_LO / HUE_HI 就行。
 """
 import sys, os
 import numpy as np
 from PIL import Image, ImageFilter
 
-SRC = os.path.join(os.path.dirname(__file__), '..', '喵同学.png')
-OUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'assets', 'pet')
-OUT = os.path.join(OUT_DIR, 'cat.png')
+HERE = os.path.dirname(os.path.abspath(__file__))
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '喵同学.png')
+OUT_NAME = sys.argv[2] if len(sys.argv) > 2 else 'cat.png'
+OUT_DIR = os.path.join(HERE, '..', 'assets', 'pet')
+OUT = os.path.join(OUT_DIR, OUT_NAME)
+
+HUE_LO, HUE_HI = 172, 245
 
 def main():
     img = Image.open(SRC).convert('RGBA')
@@ -17,7 +27,7 @@ def main():
     H, S, V = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
 
     # 紫色色相区间（0-255 刻度）
-    purple = ((H >= 172) & (H <= 245)).astype(np.float32)
+    purple = ((H >= HUE_LO) & (H <= HUE_HI)).astype(np.float32)
 
     # 饱和度越低越可能是猫（白毛），用饱和度和明度做软过渡，保住边缘抗锯齿
     sat_ramp = np.clip((S - 40.0) / 90.0, 0, 1)      # S<40 全保留，S>130 全判背景
