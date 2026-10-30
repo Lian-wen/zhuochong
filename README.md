@@ -113,7 +113,7 @@ npm run dist
 产物在 `release/`：
 
 - `Zhuochong-Setup-0.2.0.exe` —— 安装版，可选安装目录、自动建桌面快捷方式
-- `Zhuochong-0.2.0-portable.exe` —— 免安装绿色版，双击即用，拷到 U 盘也能跑
+- `Zhuochong-0.2.0-portable.exe` —— 免安装绿色版，双击即用
 
 国内网络如果卡在下载打包工具（winCodeSign / nsis），改用镜像：
 
@@ -121,6 +121,26 @@ npm run dist
 set ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
 npm run dist
 ```
+
+### 如果 electron-builder 起不来
+
+它依赖 `http-proxy-agent` / `https-proxy-agent` / `agent-base` 这一串包，某些安全软件会把它们的 `dist/index.js` 删掉，表现是一路报 `Cannot find module .../dist/index.js`。修法：
+
+```bash
+npm install agent-base@7 http-proxy-agent@7 https-proxy-agent@7 --no-save --prefer-online
+```
+
+实在修不好，可以直接手工组装绿色版 —— Electron 应用本质就是「一份 Electron 运行时 + 你的源码」：
+
+```bash
+mkdir -p release/桌宠-win32-x64/resources/app
+cp -r node_modules/electron/dist/* release/桌宠-win32-x64/
+mv release/桌宠-win32-x64/electron.exe release/桌宠-win32-x64/桌宠.exe
+cp main.js preload.js package.json release/桌宠-win32-x64/resources/app/
+cp -r lib renderer tools release/桌宠-win32-x64/resources/app/
+```
+
+把 `assets/pet/cat.png` 一起放进 `resources/app/assets/pet/` 就有了内置形象。双击 `桌宠.exe` 即可运行。这样出来的是**文件夹**（约 325MB，压缩后 131MB），不是安装包，但拷给别人就能用。
 
 打包时 `assets/pet/` 里除 `cat.png` 外的图会被排除（`build.files` 里写了 `!assets/pet/!(cat.png)`），因为那些是个人素材，不该进安装包。
 
